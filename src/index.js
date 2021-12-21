@@ -8,12 +8,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// { 
-// 	id: 'uuid', // precisa ser um uuid
-// 	name: 'Danilo Vieira', 
-// 	username: 'danilo', 
-// 	todos: []
-// }
+function getTodo(request) {
+  return request.user.todos.filter((item) => item.id == request.params.id)[0];
+}
 
 const users = [];
 
@@ -74,11 +71,9 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body
 
-  const todo = request.user.todos.filter((item) => item.id == request.params.id)[0]
+  const todo = getTodo(request)
 
-  if(!todo){
-    return response.status(404).json({error: 'Todo Not Found'})
-  }
+  if(!todo) return response.status(404).json({error: 'Todo Not Found'})
 
   todo.title = title
   todo.deadline = new Date(deadline) 
@@ -87,11 +82,9 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  const todo = request.user.todos.filter((item) => item.id == request.params.id)[0]
+  const todo = getTodo(request)
 
-  if(!todo){
-    return response.status(404).json({error: 'Todo Not Found'})
-  }
+  if(!todo) return response.status(404).json({error: 'Todo Not Found'})
 
   todo.done = !todo.done
 
